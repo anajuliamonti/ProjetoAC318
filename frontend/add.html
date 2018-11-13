@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <title>SOS Receitas</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom : 20px">
+        <a class="navbar-brand h1" href="#">
+            <img src="images/S (1).png" width="70" height="30" alt="">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="add.html">Adicionar</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="col-6 col align-self-center">
+            <h5 class="lead">Preencha as informações da sua receita</h5>
+            <hr>
+            <div class="form-group ">
+                <label for="nome">Nome</label>
+                <input type="text" class="form-control" id="nome" placeholder="Nome da receita">
+            </div>
+            <div class="form-group">
+                <label for="token">Token da Receita</label>
+                <input type="password" class="form-control" id="token" placeholder="Token">
+                <small class="form-text text-muted">O token será usado para que você realize modificações na sua
+                    receita.</small>
+            </div>
+            <div class="form-group ">
+                <label for="ingredientes">Ingredientes</label>
+                <input type="text" class="form-control" id="ingredientes" placeholder="Ingredientes">
+                <small class="form-text text-muted">Coloque os ingredientes separados por vírgula.</small>
+            </div>
+            <div class="form-group">
+                <label for="descricao">Descrição</label>
+                <textarea class="form-control" id="descricao" rows="5"></textarea>
+                <small class="form-text text-muted">Aqui você deve descrever todo o passo a passo da sua receita.</small>
+            </div>
+            <div class="form-group">
+                <label for="nivel">Nível de dificuldade</label>
+                <select class="form-control" id="nivel">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tempo">Tempo de preparo</label>
+                <input type="text" class="form-control" id="tempo" placeholder="Tempo de preparo">
+                <small class="form-text text-muted">Entre com o tempo em minutos.</small>
+            </div>
+            <div class="form-group">
+                <label for="rendimento">Rendimento</label>
+                <input type="text" class="form-control" id="rendimento" name="rendimento" laceholder="Rendimento">
+                <small class="form-text text-muted">Entre com a quantidade de porções.</small>
+            </div>
+            <button type="submit" id="salvar" class="btn btn-info" style="margin-bottom : 20px">Enviar</button>
+        </div>
+    </div>
+
+    <!-- Chamada do SweetAlert -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <!-- Chamada do JQuery -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <!-- Chamada do Materialize -->
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+
+</body>
+
+<script type="text/javascript">
+    $("#salvar").click(function () {
+        var receita = {
+            nome: $("#nome").val(),
+            token: $("#token").val(),
+            ingredientes: $("#ingredientes").val(),
+            descricao: $("#descricao").val(),
+            nivel: document.getElementById('nivel').value,
+            tempo: $("#tempo").val(),
+            rendimento: $("#rendimento").val()
+        }
+
+        $.ajax({
+            url: 'http://localhost:3000/receitas/adicionar',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                nome: receita.nome,
+                token: receita.token,
+                ingredientes: receita.ingredientes,
+                descricao: receita.descricao,
+                nivel: receita.nivel,
+                tempo: receita.tempo,
+                rendimento: receita.rendimento
+            },
+            success: function () {
+                swal("Sucesso!", "Receita cadastrada com sucesso!", "success").then((value) => {
+                    window.location.href = "index.html";
+                });
+            },
+            error: function (er) {
+                console.log(er.data);
+            }
+
+        })
+    });
+    
+</script>
+
+</html>

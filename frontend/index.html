@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <title>SOS Receitas</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom : 20px">
+        <a class="navbar-brand h1" href="#">
+            <img src="images/S (1).png" width="70" height="30" alt="">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="add.html">Adicionar</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="lista" class="row"></div>
+    </div>
+    </div>
+
+    </div>
+
+    <!-- Chamada do JQuery -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <!-- Chamada do Bootstrap -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+</body>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: 'http://localhost:3000/receitas/buscarReceitas',
+            type: 'GET',
+            success: function (result) {
+                $.each(result, function (indice, receita) {
+                    $("#lista").append('<div class="col s12 m6 l4">' +
+                        '<div class="card" style="width: 15rem; margin-bottom: 20px">' +
+                        '<div class="card-body">' +
+                        '<h5 class="card-title">' + receita.nome + '</h5>' +
+                        '<p class="card-text">' + receita.descricao + '</p>' +
+                        '<a href="receita.html?id=' + receita.id + '" class="btn btn-secondary">Ver receita</a>' +
+                        '</div>' +
+                        '</div>');
+                })
+            },
+            error: function () {
+                alert("Erro ao carregar receita");
+            }
+        })
+    });
+
+
+</script>
+
+</html>

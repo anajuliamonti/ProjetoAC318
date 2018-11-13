@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <title>SOS Receitas</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom: 20px">
+        <a class="navbar-brand h1" href="#">
+            <img src="images/S (1).png" width="70" height="30" alt="">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="add.html">Adicionar</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tituloModal">Editar livro</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="conteudoModalEdit">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Infos receita -->
+    <div class="container">
+        <div id="receita" class="row" style="margin-bottom: 20px"></div>
+        <div class="row" style="margin-bottom : 20px">
+            <button type="button" style="margin: 0 20px;" id="atualizar" class="btn btn-info">Atualizar</button>
+            <button type="button" id="remover" class="btn btn-danger">Remover</button>
+        </div>
+    </div>
+
+    <!-- Chamada do SweetAlert -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <!-- Chamada do JQuery -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <!-- Chamada do Bootstrap -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <script>
+        //Função que pega o parametro enviado pela URL
+        function queryString(parameter) {
+            var loc = location.search.substring(1, location.search.length);
+            var param_value = false;
+            var params = loc.split("&");
+            for (i = 0; i < params.length; i++) {
+                param_name = params[i].substring(0, params[i].indexOf('='));
+                if (param_name == parameter) {
+                    param_value = params[i].substring(params[i].indexOf('=') + 1)
+                }
+            }
+            if (param_value) {
+                return param_value;
+            }
+            else {
+                return undefined;
+            }
+        }
+
+        function removerReceita(id) {
+            var resultado;
+            $.ajax({
+                url: 'http://localhost:3000/receitas/remover',
+                type: 'POST',
+                async: false,
+                data: { id: id },
+                success: function (result) {
+                    resultado = "";
+                },
+                error: function (erro) {
+                    resultado = erro;
+                }
+            })
+            return resultado;
+        }
+
+        $(document).ready(function () {
+            var id = queryString("id");
+
+            $.ajax({
+                url: 'http://localhost:3000/receitas/buscar/' + id,
+                type: 'GET',
+                success: function (result) {
+                    $.each(result, function (indice, receita) {
+                        $("#receita").append('<div class="col-md-6">' +
+                            '<p class="text-lg-center font-weight-bold">' + receita.nome + '</p>' +
+                            '<hr>' +
+                            '<p class="text-md-left font-weight-bold"> INGREDIENTES </p>' +
+                            '<p>' + receita.ingredientes + '</p>' +
+                            '<p class="text-md-left font-weight-bold"> DESCRIÇÃO </p>' +
+                            '<p>' + receita.descricao + '</p>' +
+                            '<p class="text-md-left font-weight-bold"> NÍVEL DE DIFICULDADE </p>' +
+                            '<p>' + receita.nivel + '</p>' +
+                            '<p class="text-md-left font-weight-bold"> RENDIMENTO </p>' +
+                            '<p>' + receita.rendimento + ' porções </p>' +
+                            '<p class="text-md-left font-weight-bold"> TEMPO DE PREPARO </p>' +
+                            '<p>' + receita.tempo + ' minutos</p>' +
+                            '</div>'
+                        )
+                    })
+                },
+                error: function () {
+                    alert("Erro ao carregar receita!");
+                }
+            })
+        });
+
+        $("#remover").click(function () {
+            var id = queryString("id");
+            var token = buscaTokenReceita(id);
+
+            swal("Digite o Token da receita:", {
+                content: "input",
+            }).then((value) => {
+                if (token == value) {
+                    swal("Deseja mesmo excluir esta receita?", {
+                        buttons: { cancelar: "Cancelar", sim: "Sim" }
+                    }).then((value) => {
+                        switch (value) {
+                            case "cancelar":
+                                break;
+
+                            case "sim":
+                                var resultado;
+                                resultado = removerReceita(id);
+
+                                if (resultado == "") {
+                                    swal("Sucesso!", "Receita removida!", "success")
+                                        .then((value) => {
+                                            window.location.href = "index.html";
+                                        });
+                                } else {
+                                    swal("Erro!", "Não foi possível remover esta receita!", "error");
+                                }
+                                break;
+                        }
+                    });
+                } else {
+                    swal("Erro!", "Erro no token!", "error");
+                }
+            });
+        });
+
+
+        $("#atualizar").click(function () {
+            var id = queryString("id");
+            var token = buscaTokenReceita(id);
+
+            swal("Digite o Token da receita:", {
+                content: "input",
+            }).then((value) => {
+                if (token == value) {
+                    window.location.href = "editar.html?id=" + id;
+                } else {
+                    swal("Erro!", "Erro no token!", "error");
+                }
+            });
+        });
+
+        function buscaTokenReceita(id) {
+            var token;
+            $.ajax({
+                url: 'http://localhost:3000/receitas/buscar/' + id,
+                type: 'GET',
+                async: false,
+                success: function (result) {
+                    token = result[0].token;
+                },
+                error: function (erro) {
+                    alert(erro);
+                }
+            });
+
+            return (token);
+        }
+    </script>
+
+</body>
